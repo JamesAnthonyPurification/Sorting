@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void swap(int *x, int *y) {
+    int t = *x;
+    *x = *y;
+    *y = t;
+}
+
+int Pivot(int A[], int Beg, int End) {
+    int Left = Beg;
+    int Right = End;
+    int Loc = Beg;
+
+    while (1) {
+        while (A[Loc] <= A[Right] && Loc != Right)
+            Right = Right - 1;
+
+        if (Loc == Right)
+            return Loc;
+
+        if (A[Loc] > A[Right]) {
+            swap(&A[Loc], &A[Right]);
+            Loc = Right;
+        }
+
+        while (A[Loc] >= A[Left] && Loc != Left)
+            Left = Left + 1;
+
+        if (Loc == Left)
+            return Loc;
+
+        if (A[Loc] < A[Left]) {
+            swap(&A[Loc], &A[Left]);
+            Loc = Left;
+        }
+    }
+}
+
+ 
+void QuickSort_Stack(int A[], int N) {
+    if (N <= 1) return;
+
+    int *Lower = (int *)malloc((N + 5) * sizeof(int));
+    int *Upper = (int *)malloc((N + 5) * sizeof(int));
+    if (!Lower || !Upper) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int Top = 0;
+
+    Top = Top + 1;
+    Lower[Top] = 1;
+    Upper[Top] = N;
+
+    while (Top != 0) {
+        int Beg = Lower[Top];
+        int End = Upper[Top];
+        Top = Top - 1;
+
+        int Loc = Pivot(A, Beg, End);
+
+        if (Beg < Loc - 1) {
+            Top = Top + 1;
+            Lower[Top] = Beg;
+            Upper[Top] = Loc - 1;
+        }
+
+        if (Loc + 1 < End) {
+            Top = Top + 1;
+            Lower[Top] = Loc + 1;
+            Upper[Top] = End;
+        }
+    }
+
+    free(Lower);
+    free(Upper);
+}
+
+int main(void) {
+    int N;
+    printf("Enter number of elements N: ");
+    if (scanf("%d", &N) != 1 || N <= 0) {
+        printf("Invalid N. Exiting.\n");
+        return 0;
+    }
+
+    int *A = (int *)malloc((N + 1) * sizeof(int));
+    if (!A) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
+
+    printf("Enter %d elements  :\n", N);
+    for (int i = 1; i <= N; ++i) {
+        if (scanf("%d", &A[i]) != 1) {
+            fprintf(stderr, "Failed to read element %d\n", i);
+            free(A);
+            return 1;
+        }
+    }
+
+    printf("Before sorting:\n");
+    for (int i = 1; i <= N; ++i) printf("%d ", A[i]);
+    printf("\n");
+
+    QuickSort_Stack(A, N);
+
+    printf("After sorting:\n");
+    for (int i = 1; i <= N; ++i) printf("%d ", A[i]);
+    printf("\n");
+
+   
+    return 0;
+}
