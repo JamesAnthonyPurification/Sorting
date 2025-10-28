@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void Merge(int List[], int TmpList[], int Lpos, int Rpos, int RightEnd) {
+    int LeftEnd = Rpos - 1;
+    int TmpPos = Lpos;
+    int NumElements = RightEnd - Lpos + 1;
+
+    while (Lpos <= LeftEnd && Rpos <= RightEnd) {
+        if (List[Lpos] <= List[Rpos])
+            TmpList[TmpPos++] = List[Lpos++];
+        else
+            TmpList[TmpPos++] = List[Rpos++];
+    }
+    while (Lpos <= LeftEnd)
+        TmpList[TmpPos++] = List[Lpos++];
+    while (Rpos <= RightEnd)
+        TmpList[TmpPos++] = List[Rpos++];
+
+    for (int i = 0; i < NumElements; i++) {
+        List[RightEnd] = TmpList[RightEnd];
+        RightEnd--;
+    }
+}
+
+void Msort(int List[], int TmpList[], int Left, int Right) {
+    if (Left < Right) {
+        int Center = (Left + Right) / 2;
+        Msort(List, TmpList, Left, Center);
+        Msort(List, TmpList, Center + 1, Right);
+        Merge(List, TmpList, Left, Center + 1, Right);
+    }
+}
+
+void Mergesort(int List[], int N) {
+    if (N <= 1) return;
+    int *TmpList = (int *)malloc(sizeof(int) * N);
+    if (TmpList == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    Msort(List, TmpList, 0, N - 1);
+    free(TmpList);
+}
+
+void printArray(int a[], int n) {
+    for (int i = 0; i < n; i++) {
+        if (i) printf(" ");
+        printf("%d", a[i]);
+    }
+    printf("\n");
+}
+
+int main(void) {
+    int n;
+    printf("Enter number of elements (N): ");
+    if (scanf("%d", &n) != 1 || n < 0) {
+        fprintf(stderr, "Invalid N\n");
+        return 1;
+    }
+    if (n == 0) {
+        printf("Empty array. Nothing to sort.\n");
+        return 0;
+    }
+
+    int *arr = (int *)malloc(sizeof(int) * n);
+    if (!arr) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
+
+    printf("Enter elements %d :\n", n);
+    for (int i = 0; i < n; i++) {
+        if (scanf("%d", &arr[i]) != 1) {
+            fprintf(stderr, "Invalid input at element %d\n", i);
+      
+            return 1;
+        }
+    }
+
+    printf("Before sorting:\n");
+    printArray(arr, n);
+
+    Mergesort(arr, n);
+
+    printf("After sorting:\n");
+    printArray(arr, n);
+
+   
+    return 0;
+}
