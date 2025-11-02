@@ -1,0 +1,288 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define Node structure
+struct Node {
+    int Info;
+    struct Node* Link;
+};
+
+// Start pointer
+struct Node* Start = NULL;
+
+// Function to create a new node
+struct Node* createNode(int Item) {
+    struct Node* New = (struct Node*)malloc(sizeof(struct Node));
+    New->Info = Item;
+    New->Link = NULL;
+    return New;
+}
+
+/*-----------------------------------------
+1. INSERTION AT BEGINNING
+------------------------------------------*/
+void Insert_Begin(int Item) {
+    struct Node* New = createNode(Item);
+    New->Link = Start;
+    Start = New;
+}
+
+/*-----------------------------------------
+2. INSERTION BEFORE A GIVEN NODE
+------------------------------------------*/
+void Insert_Before_Node(int Item, int Given_Item) {
+    struct Node* New = createNode(Item);
+
+    if (Start == NULL) {
+        printf("List is empty!\n");
+        free(New);
+        return;
+    }
+
+    if (Start->Info == Given_Item) {
+        New->Link = Start;
+        Start = New;
+        return;
+    }
+
+    struct Node* Save = Start;
+    struct Node* PTR = Start->Link;
+
+    while (PTR != NULL && PTR->Info != Given_Item) {
+        Save = PTR;
+        PTR = PTR->Link;
+    }
+
+    if (PTR == NULL) {
+        printf("Given item %d not found in list!\n", Given_Item);
+        free(New);
+        return;
+    }
+
+    New->Link = PTR;
+    Save->Link = New;
+}
+
+/*-----------------------------------------
+3. INSERTION AT A GIVEN LOCATION (1-based)
+------------------------------------------*/
+void Insert_In_LOC(int Item, int LOC) {
+    struct Node* New = createNode(Item);
+
+    if (LOC == 1) {
+        New->Link = Start;
+        Start = New;
+        return;
+    }
+
+    struct Node* Save = Start;
+    struct Node* PTR = Start ? Start->Link : NULL;
+    int Count = 1;
+
+    while (PTR != NULL && Count + 1 != LOC) {
+        Save = PTR;
+        PTR = PTR->Link;
+        Count++;
+    }
+
+    if (PTR == NULL && Count + 1 != LOC) {
+        printf("Location out of range!\n");
+        free(New);
+        return;
+    }
+
+    New->Link = PTR;
+    Save->Link = New;
+}
+
+/*-----------------------------------------
+4. INSERTION INTO SORTED LIST
+------------------------------------------*/
+void Insert_Sorted_List(int Item) {
+    struct Node* New = createNode(Item);
+
+    if (Start == NULL || Item < Start->Info) {
+        New->Link = Start;
+        Start = New;
+        return;
+    }
+
+    struct Node* Save = Start;
+    struct Node* PTR = Start->Link;
+
+    while (PTR != NULL && Item > PTR->Info) {
+        Save = PTR;
+        PTR = PTR->Link;
+    }
+
+    New->Link = PTR;
+    Save->Link = New;
+}
+
+/*-----------------------------------------
+5. DELETE FIRST NODE
+------------------------------------------*/
+void Delete_First() {
+    if (Start == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+    struct Node* temp = Start;
+    Start = Start->Link;
+    free(temp);
+}
+
+/*-----------------------------------------
+6. DELETE NODE BY LOCATION
+------------------------------------------*/
+void Delete_Node_LOC(int LOC) {
+    if (Start == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+
+    if (LOC == 1) {
+        struct Node* temp = Start;
+        Start = Start->Link;
+        free(temp);
+        return;
+    }
+
+    struct Node* Save = Start;
+    struct Node* PTR = Start->Link;
+    int Count = 1;
+
+    while (PTR != NULL && Count + 1 != LOC) {
+        Save = PTR;
+        PTR = PTR->Link;
+        Count++;
+    }
+
+    if (PTR == NULL) {
+        printf("Location not found!\n");
+        return;
+    }
+
+    Save->Link = PTR->Link;
+    free(PTR);
+}
+
+/*-----------------------------------------
+7. DELETE NODE BY VALUE
+------------------------------------------*/
+void Delete_Node_Value(int Item) {
+    if (Start == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+
+    if (Start->Info == Item) {
+        struct Node* temp = Start;
+        Start = Start->Link;
+        free(temp);
+        return;
+    }
+
+    struct Node* Save = Start;
+    struct Node* PTR = Start->Link;
+
+    while (PTR != NULL && PTR->Info != Item) {
+        Save = PTR;
+        PTR = PTR->Link;
+    }
+
+    if (PTR == NULL) {
+        printf("Item %d not found in the list!\n", Item);
+        return;
+    }
+
+    Save->Link = PTR->Link;
+    free(PTR);
+}
+
+/*-----------------------------------------
+8. DISPLAY FUNCTION
+------------------------------------------*/
+void Display() {
+    struct Node* temp = Start;
+    if (temp == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+    printf("Linked List: ");
+    while (temp != NULL) {
+        printf("%d -> ", temp->Info);
+        temp = temp->Link;
+    }
+    printf("NULL\n");
+}
+
+/*-----------------------------------------
+MAIN PROGRAM
+------------------------------------------*/
+int main() {
+    int choice, item, given_item, loc;
+
+    while (1) {
+        printf("\n===== LINKEDIN MENU =====\n");
+        printf("1. Insert at Beginning\n");
+        printf("2. Insert Before Given Node\n");
+        printf("3. Insert at Given Location\n");
+        printf("4. Insert into Sorted List\n");
+        printf("5. Delete First Node\n");
+        printf("6. Delete Node at Location\n");
+        printf("7. Delete Node with Given Value\n");
+        printf("8. Display List\n");
+        printf("9. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &item);
+                Insert_Begin(item);
+                break;
+            case 2:
+                printf("Enter new value: ");
+                scanf("%d", &item);
+                printf("Enter existing value to insert before: ");
+                scanf("%d", &given_item);
+                Insert_Before_Node(item, given_item);
+                break;
+            case 3:
+                printf("Enter value: ");
+                scanf("%d", &item);
+                printf("Enter location: ");
+                scanf("%d", &loc);
+                Insert_In_LOC(item, loc);
+                break;
+            case 4:
+                printf("Enter value: ");
+                scanf("%d", &item);
+                Insert_Sorted_List(item);
+                break;
+            case 5:
+                Delete_First();
+                break;
+            case 6:
+                printf("Enter location: ");
+                scanf("%d", &loc);
+                Delete_Node_LOC(loc);
+                break;
+            case 7:
+                printf("Enter value to delete: ");
+                scanf("%d", &item);
+                Delete_Node_Value(item);
+                break;
+            case 8:
+                Display();
+                break;
+            case 9:
+                exit(0);
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
